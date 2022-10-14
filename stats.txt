@@ -1,0 +1,13 @@
+Total Profit:
+0
+Hands Played:
+0
+Hands Won:
+0
+Times Folded:
+0
+Most Common Hand:
+
+Most Profitable Hand (average):
+
+
