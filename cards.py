@@ -2,7 +2,7 @@
 
 class Card(object):
     card_values = {
-        'A': 11,  # value of the ace is high until it needs to be low
+        'A': 14,  # value of the ace is high until it needs to be low
         '2': 2,
         '3': 3,
         '4': 4,
@@ -12,10 +12,15 @@ class Card(object):
         '8': 8,
         '9': 9,
         'T': 10,
-        'J': 10,
-        'Q': 10,
-        'K': 10
+        'J': 11,
+        'Q': 12,
+        'K': 13
     }
+
+    def __init__(self) -> None:
+        self.value = "none"
+        self.suit = "none"
+        self.points = "none"
 
     def __init__(self, value, suit):
         """

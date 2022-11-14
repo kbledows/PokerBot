@@ -9,8 +9,31 @@ from strategy import *
 import sys
 import os
 
+player_cards = []
+dealer_cards = []
 
-def poker_hand():
+# Main gameplay loop
+
+
+def game():
+    numTurn = 1
+    while (numTurn < 5):
+        # preflop turn is the first turn
+        if numTurn == 1:
+            pre_flop()
+        # flop occurs on the second turn
+        elif numTurn == 2:
+            while len(dealer_cards) < 3:
+                dealing_cards()
+            print_cards(dealer_cards)
+            current_hand(player_cards, dealer_cards)
+        else:  # not the first turn
+            sys.exit()
+        numTurn += 1
+    print("This round has concluded, returning to main menu...")
+
+
+def pre_flop():
     print("You have just been dealt a new hand. Please enter your cards using the following format:")
     print("Ten of Clubs == [Tc]")
     print("Possible card values: 2 3 4 5 6 7 8 9 T J Q K A")
@@ -22,7 +45,7 @@ def poker_hand():
     player_hand1 = ""
     player_hand2 = ""
     suited = "o"
-    os.system('clear')
+    # os.system('clear')
     print("##################################")
     player_hand1 += firstCard.value
     player_hand1 += secondCard.value
@@ -40,16 +63,20 @@ def poker_hand():
         print("Your hand is decent. [B Tier]")
     elif (player_hand1 in CTier) or (player_hand2 in CTier):
         print("Your hand is poor. [C Tier]")
-        print("Suggested play: fold, unless you're going last. Examine how the other players are betting pre-flop.")
+        print(
+            "Suggested play: fold, unless you're going last. Examine how the other players are betting pre-flop.")
     elif (player_hand1 in DTier) or (player_hand2 in DTier):
         print("Your hand is awful. [D Tier]")
-        print("Suggested play: Fold preflop. Only play this hand as a small blind.")
+        print(
+            "Suggested play: Fold preflop. Only play this hand as a small blind.")
     else:
         print("Your hand is trash!")
         print("Suggested play: fold immediately.")
     if firstCard.suit == secondCard.suit:
         suited = "s"
         print("NOTE: Your cards are suited! Watch for a possible flush draw.")
+    player_cards.append(firstCard)
+    player_cards.append(secondCard)
     print("##################################")
     print("Pre-flop turn. What would you like to do?")
     print("1. Call/Raise")
@@ -59,25 +86,24 @@ def poker_hand():
         print("You have decided to keep playing.")
         # Player now enters 3 flop cards for calculation
     elif choice == "2":
-        print("You have folded. Thank you for using PokerBot")
+        print("You have decided to fold your hand.")
         # update stats and return to main menu
 
+# Dealing a card to the table
 
-def pre_flop():
-    print("Pre-flop turn. What would you like to do?")
-    print("1. Call/Raise")
-    print("2. Fold")
-    choice = input(" >")
-    if choice == "1":
-        print("You have decided to keep playing.")
-        # Player now enters 3 flop cards for calculation
-    elif choice == "2":
-        print("You have decided to fold your hand. Thank you for using PokerBot")
-        # update stats and return to main menu
+
+def dealing_cards():
+    print("The dealer has dealt a card! Please enter the card's value and suit in the following format:")
+    print("Ten of Clubs == [Tc]")
+    ask = input(" >")
+    dealt_card = Card(ask[0], ask[1])
+    dealer_cards.append(dealt_card)
+
+# Printing ASCII version of playing cards
 
 
 def print_cards(cards):
-    suits_name = ['S', 'D', 'H', 'C']
+    suits_name = ['s', 'd', 'h', 'c']
     suits_symbols = ['♠', '♦', '♥', '♣']
     lines = [[] for i in range(9)]
     for index, card in enumerate(cards):
@@ -111,29 +137,45 @@ def print_cards(cards):
     print('\n'.join(result))
 
 
+# Statistics & file IO
+
+
+def statistics():
+    pass
+
+# Main Menu
+
+
 def main():
     print("Welcome to PokerBot 1.0.0")
     print("Author: Konrad Bledowski")
-
-    print("What would you like to do?")
-    print("1. Play a game")
-    print("2. View statistics")
-    print("3. Quit")
     # test_card_1 = Card('4', 'D')
     # test_card_2 = Card('A', 'C')
     # test_card_3 = Card('J', 'S')
     # test_card_4 = Card('T', 'H')
 
     # print_cards([test_card_1, test_card_2, test_card_3, test_card_4])
-    choice = input(" > ")
-    if choice == "1":
-        print("Starting game...")
-        poker_hand()
-    elif choice == "2":
-        print("Statistics not yet implemented :(")
-    elif choice == "3":
-        print("Thank you for using PokerBot. Goodbye")
-        sys.exit()
+    playing = True
+    choice = ""
+    while playing:
+        print("What would you like to do?")
+        print("1. Play a game")
+        print("2. View statistics")
+        print("3. Quit")
+        choice = input(" > ")
+        if choice == "1":
+            print("Starting game...")
+            game()
+        elif choice == "2":
+            print("Statistics not yet implemented :(")
+        elif choice == "3":
+            playing = False
+        else:
+            print("Invalid input! Please try again.")
+
+    print("Thank you for using PokerBot. Goodbye")
+    sys.exit()
 
 
-main()
+if __name__ == "__main__":
+    main()
