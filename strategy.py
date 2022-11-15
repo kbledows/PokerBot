@@ -79,7 +79,7 @@ def current_hand(player_cards, dealer_cards):
 
 
 def calculate_best(possible_hand, pd_card_values):
-    print("These are your cards vals: " + str(pd_card_values))
+    # print("These are your cards vals: " + str(pd_card_values))
     value = 0
     if (contains_straight(pd_card_values) and contains_flush(possible_hand)):  # Covers straight flush
         return 9

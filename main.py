@@ -9,7 +9,6 @@ from strategy import *
 from statistics import *
 import sys
 import os
-os.system("")
 
 player_cards = []
 dealer_cards = []
@@ -24,6 +23,13 @@ WELCOME = """
                                                            
                                                            
 """
+
+
+def cls():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+# now, to clear the screen
 
 
 # Main gameplay loop
@@ -41,13 +47,25 @@ def game():
         elif numTurn == 2:
             while len(dealer_cards) < 3:
                 dealing_cards()
+            cls()
+            print("These are the cards on the table:")
+            print("")
             print_cards(dealer_cards)
+            print("This is your hand:")
+            print("")
+            print_cards(player_cards)
             current_hand(player_cards, dealer_cards)
             print("Post-flop turn. What would you like to do?")
             playing = call_or_fold()
         else:
             dealing_cards()
+            cls()
+            print("These are the cards on the table:")
+            print("")
             print_cards(dealer_cards)
+            print("This is your hand:")
+            print("")
+            print_cards(player_cards)
             current_hand(player_cards, dealer_cards)
             print("Turn #", numTurn, "What would you like to do?")
             playing = call_or_fold()
@@ -68,7 +86,7 @@ def pre_flop():
     player_hand1 = ""
     player_hand2 = ""
     suited = "o"
-    os.system('clear')
+    cls()
     print("##################################")
     player_hand1 += firstCard.value
     player_hand1 += secondCard.value
@@ -133,10 +151,17 @@ def call_or_fold():
 
 
 def print_cards(cards):
-    suits_name = ['s', 'd', 'h', 'c']
-    suits_symbols = ['♠', '♦', '♥', '♣']
+    cards_copy = cards.copy()
+    empty = Card('?', '?')
+    if (len(cards) == 3):
+        cards_copy.append(empty)
+        cards_copy.append(empty)
+    if (len(cards) == 4):
+        cards_copy.append(empty)
+    suits_name = ['s', 'd', 'h', 'c', '?']
+    suits_symbols = ['♠', '♦', '♥', '♣', '?']
     lines = [[] for i in range(9)]
-    for index, card in enumerate(cards):
+    for index, card in enumerate(cards_copy):
         # "King" should be "K" and "10" should still be "10"
         if card.value == 'T':  # ten is the only one who's rank is 2 char long
             rank = '10'
@@ -177,6 +202,7 @@ def statistics():
 
 
 def main():
+    cls()
     print(WELCOME)
     print("Author: Konrad Bledowski")
     # test_card_1 = Card('4', 'D')

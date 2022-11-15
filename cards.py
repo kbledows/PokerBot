@@ -14,7 +14,8 @@ class Card(object):
         'T': 10,
         'J': 11,
         'Q': 12,
-        'K': 13
+        'K': 13,
+        '?': 0
     }
 
     def __init__(self) -> None:
