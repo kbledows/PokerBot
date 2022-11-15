@@ -205,5 +205,5 @@ def debug_func():
 
 
 if __name__ == "__main__":
-    # main()
-    debug_func()
+    main()
+    # debug_func()
