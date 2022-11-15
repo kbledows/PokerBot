@@ -17,10 +17,11 @@ dealer_cards = []
 
 def game():
     numTurn = 1
-    while (numTurn < 5):
+    playing = True
+    while (numTurn < 5) and playing == True:
         # preflop turn is the first turn
         if numTurn == 1:
-            pre_flop()
+            playing = pre_flop()
         # flop occurs on the second turn
         elif numTurn == 2:
             while len(dealer_cards) < 3:
@@ -38,6 +39,7 @@ def pre_flop():
     print("Ten of Clubs == [Tc]")
     print("Possible card values: 2 3 4 5 6 7 8 9 T J Q K A")
     print("Possible suits: Spades (s), Hearts (h), Clubs (c), Diamonds (d)")
+    # add while loop with input validation
     card1 = input("Enter your first card's value and suit >")
     firstCard = Card(card1[0], card1[1])
     card2 = input("Enter your second card's value and suit >")
@@ -84,9 +86,11 @@ def pre_flop():
     choice = input(" >")
     if choice == "1":
         print("You have decided to keep playing.")
+        return True
         # Player now enters 3 flop cards for calculation
     elif choice == "2":
         print("You have decided to fold your hand.")
+        return False
         # update stats and return to main menu
 
 # Dealing a card to the table

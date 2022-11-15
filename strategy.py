@@ -1,10 +1,37 @@
 import itertools
 
+hand_values = {
+    1: "High card",
+    2: "One pair",
+    3: "Two pair",
+    4: "Three of a kind",
+    5: "Straight",
+    6: "Flush",
+    7: "Full house",
+    8: "Four of a kind",
+    9: "Straight flush"
+}
 
-cards = ['2s', '2h', '2d', '2c', '3s', '3h', '3d', '3c', '4s', '4h', '4d', '4c', '5s', '5h', '5d', '5c', '6s', '6h', '6d', '6c', '7s', '7h', '7d', '7c', '8s',
-         '8h', '8d', '8c', '9s', '9h', '9d', '9c', 'Ts', 'Th', 'Td', 'Tc', 'Js', 'Jh', 'Jd', 'Jc', 'Qs', 'Qh', 'Qd', 'Qc', 'Ks', 'Kh', 'Kd', 'Kc', 'As', 'Ah', 'Ad', 'Ac']
+card_values = {
+    14: "Ace",  # value of the ace is high until it needs to be low
+    2: "Two",
+    3: "Three",
+    4: "Four",
+    5: "Five",
+    6: "Six",
+    7: "Seven",
+    8: "Eight",
+    9: "Nine",
+    10: "Ten",
+    11: "Jack",
+    12: "Queen",
+    13: "King"
+}
 
-possible_hands = itertools.combinations(cards, 5)
+all_possible_cards = ['2s', '2h', '2d', '2c', '3s', '3h', '3d', '3c', '4s', '4h', '4d', '4c', '5s', '5h', '5d', '5c', '6s', '6h', '6d', '6c', '7s', '7h', '7d', '7c', '8s',
+                      '8h', '8d', '8c', '9s', '9h', '9d', '9c', 'Ts', 'Th', 'Td', 'Tc', 'Js', 'Jh', 'Jd', 'Jc', 'Qs', 'Qh', 'Qd', 'Qc', 'Ks', 'Kh', 'Kd', 'Kc', 'As', 'Ah', 'Ad', 'Ac']
+
+#possible_hands = list(itertools.combinations(all_possible_cards, 5))
 
 STier = ['AAo', 'AKs', 'AQs', 'AJs', 'ATs', 'A9s',
          'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s', 'AKo',
@@ -25,53 +52,94 @@ DTier = ['Q4s', 'Q3s', 'Q2s', 'J6s', 'J5s', 'J4s', 'J3s', 'J2s', 'T5s', 'T4s', '
 
 
 # used to determine the best hand that the player currently has
+# use itertools to create all possible variations of the hand the player has, and then find the highest value 5 card combination
 def current_hand(player_cards, dealer_cards):
+    value = 1  # priority 1
+    high_card = 0  # priority 2
+    pd_cards = player_cards + dealer_cards
+    pd_card_values = []
+    for card in pd_cards:
+        pd_card_values.append(card.points)
+    possible_hands = list(itertools.combinations(pd_cards, 5))
+    if len(pd_cards) == 5:
+        if calculate_best(pd_cards, pd_card_values) > value:
+            value = calculate_best(pd_cards, pd_card_values)
+            high_card = find_high_card(pd_card_values)
+        elif value == 1:
+            high_card = find_high_card(pd_card_values)
+    else:
+        for possible_hand in possible_hands:
+            if calculate_best(possible_hand, pd_card_values) > value:
+                value = calculate_best(possible_hand, pd_card_values)
+                high_card = find_high_card(pd_card_values)
+            elif value == 1:
+                high_card = find_high_card(pd_card_values)
+
+    print("You currently have a " + hand_values[value] + "!")
+    print("Your high card is a(n): ", card_values[high_card])
+    print("This hand has a value of:", value,
+          "out of 9, where 1 is the weakest and 9 is the strongest.")
+
+def calculate_best(possible_hand, pd_card_values):
     value = 0
-    all_cards = player_cards + dealer_cards
-    all_card_values = []
-    for card in all_cards:
-        all_card_values.append(card.points)
-    all_card_values.sort()
-    value = max(contains_straight(all_card_values), contains_flush(all_cards))
-    print("This is the value: ", value)
+    if (contains_straight(pd_card_values) and contains_flush(possible_hand)):  # Covers straight flush
+        return 9
+    # Covers 4 of a kind and full house [7,8]
+    elif (find_x_of_a_kind(pd_card_values) >= 7):
+        return find_x_of_a_kind(pd_card_values)
+    # Covers flush
+    elif (contains_flush(possible_hand)):
+        return 6
+    # Covers straight
+    elif (contains_straight(pd_card_values)):
+        return 5
+    # Covers three of a kind, 2 pair, one pair [2,3,4]
+    elif (find_x_of_a_kind(pd_card_values) >= 2):
+        return find_x_of_a_kind(pd_card_values)
+    # No hand found. Go based off of the high card
+    else:
+        return 1
+
 
 # Example all_card_values = [2,4,5,5,7,11,12]
-# High card = 1
-# One Pair = 2
-# Two Pair = 3
-# Three of a kind = 4
-# Straight = 5
-# Flush = 6
-# Full House = 7
-# 4 of a kind = 8
-# Straight Flush = 9
+# High card = 1 [done]
+# One Pair = 2 [done]
+# Two Pair = 3 [done]
+# Three of a kind = 4 [done]
+# Straight = 5 [done]
+# Flush = 6 [done]
+# Full House = 7 [done]
+# 4 of a kind = 8 [done]
+# Straight Flush = 9 [done]
 
 
+# Convert the while loop to a for loop later, wouldn't need counter anymore
 def contains_straight(all_card_values):
-    value = 0
+    straight = False
+    if 14 in all_card_values:
+        all_card_values.append(1)
+    all_card_values.sort()
     all_card_values.reverse()
-    print(all_card_values)
     prev = 0
     counter = 1
-    straight_nums = []
-    # count consecutive numbers
+    consecutive_nums = 1
     while counter < len(all_card_values):
-        print(counter, " ", prev)
-        if counter == 1 and ((all_card_values[1]) == (all_card_values[0] - 1)):
-            straight_nums.append(all_card_values[0])
-            straight_nums.append(all_card_values[1])
-        elif (all_card_values[counter]) == (all_card_values[prev] - 1):
-            straight_nums.append(all_card_values[counter])
+        if consecutive_nums == 5:
+            break
+        if (all_card_values[counter]) == (all_card_values[prev] - 1):
+            consecutive_nums += 1
+        else:
+            consecutive_nums = 1
+
         counter += 1
         prev += 1
-    if len(straight_nums) >= 5:
-        value = 5
-    print(straight_nums)
-    return value
+    if consecutive_nums >= 5:
+        straight = True
+    return straight
 
 
 def contains_flush(all_cards):
-    value = 0
+    flush = False
     diamonds, spades, clubs, hearts = 0, 0, 0, 0
     for card in all_cards:
         if card.suit == 'd':
@@ -83,13 +151,40 @@ def contains_flush(all_cards):
         else:
             hearts += 1
     if (diamonds >= 5 or spades >= 5 or clubs >= 5 or hearts >= 5):
-        value = 6
-    return value
+        flush = True
+    return flush
 
 
-def find_pairs(all_card_values):
-
-    pass
+def find_x_of_a_kind(all_card_values):
+    num_of_kind = 0
+    num_pairs = 0
+    frequency = {}
+    # iterating over the list
+    for num in all_card_values:
+        # checking the element in dictionary
+        if num in frequency:
+            # incrementing the counr
+            frequency[num] += 1
+        else:
+            # initializing the count
+            frequency[num] = 1
+    for num in frequency:
+        if frequency[num] == 2:
+            num_pairs += 1
+        if frequency[num] > num_of_kind:
+            num_of_kind = frequency[num]
+    if num_of_kind == 4:  # Four of a kind
+        return 8
+    elif num_of_kind == 3 and num_pairs == 1:  # Full House
+        return 7
+    elif num_of_kind == 3:  # 3 of a kind
+        return 4
+    elif num_pairs == 2:  # 2 pair
+        return 3
+    elif num_pairs == 1:
+        return 2
+    else:
+        return 1
 
 
 def find_high_card(values):
