@@ -61,7 +61,6 @@ def current_hand(player_cards, dealer_cards):
     pd_card_values = []
     for card in pd_cards:
         pd_card_values.append(card.points)
-    pd_card_values.sort()
     possible_hands = list(itertools.combinations(pd_cards, 5))
     for possible_hand in possible_hands:
         if calculate_best(possible_hand, pd_card_values) > value:
@@ -110,18 +109,19 @@ def calculate_best(possible_hand, pd_card_values):
 
 # Convert the while loop to a for loop later, wouldn't need counter anymore
 def contains_straight(all_card_values):
+    straight_values = all_card_values.copy()
     straight = False
-    if 14 in all_card_values:
-        all_card_values.append(1)
-    all_card_values.sort()
-    all_card_values.reverse()
+    if 14 in straight_values:
+        straight_values.append(1)
+    straight_values.sort()
+    straight_values.reverse()
     prev = 0
     counter = 1
     consecutive_nums = 1
-    while counter < len(all_card_values):
+    while counter < len(straight_values):
         if consecutive_nums == 5:
             break
-        if (all_card_values[counter]) == (all_card_values[prev] - 1):
+        if (straight_values[counter]) == (straight_values[prev] - 1):
             consecutive_nums += 1
         else:
             consecutive_nums = 1

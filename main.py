@@ -193,5 +193,17 @@ def main():
     sys.exit()
 
 
+def debug_func():
+    test_card_1 = Card('A', 'h')
+    test_card_2 = Card('2', 'd')
+    test_card_3 = Card('9', 's')
+    test_card_4 = Card('Q', 'c')
+    test_card_5 = Card('4', 'd')
+    player_cards = [test_card_1, test_card_2]
+    dealer_cards = [test_card_3, test_card_4, test_card_5]
+    current_hand(player_cards, dealer_cards)
+
+
 if __name__ == "__main__":
-    main()
+    # main()
+    debug_func()
