@@ -6,11 +6,25 @@
 
 from cards import Card
 from strategy import *
+from statistics import *
 import sys
 import os
+os.system("")
 
 player_cards = []
 dealer_cards = []
+
+WELCOME = """
+  _____      _                _____       _                
+ |  __ \    | |              / ____|     | |               
+ | |__) |__ | | _____ _ __  | (___   ___ | |_   _____ _ __ 
+ |  ___/ _ \| |/ / _ \ '__|  \___ \ / _ \| \ \ / / _ \ '__|
+ | |  | (_) |   <  __/ |     ____) | (_) | |\ V /  __/ |   
+ |_|   \___/|_|\_\___|_|    |_____/ \___/|_| \_/ \___|_|   
+                                                           
+                                                           
+"""
+
 
 # Main gameplay loop
 
@@ -18,10 +32,11 @@ dealer_cards = []
 def game():
     numTurn = 1
     playing = True
-    while (numTurn < 4) and playing == True:
+    while (numTurn < 5) and playing == True:
         # preflop turn is the first turn
         if numTurn == 1:
-            playing = pre_flop()
+            pre_flop()
+            playing = call_or_fold()
         # flop occurs on the second turn
         elif numTurn == 2:
             while len(dealer_cards) < 3:
@@ -29,19 +44,13 @@ def game():
             print_cards(dealer_cards)
             current_hand(player_cards, dealer_cards)
             print("Post-flop turn. What would you like to do?")
-            print("1. Call/Raise")
-            print("2. Fold")
-            choice = input(" >")
-            if choice == "2":
-                print("You have decided to fold your hand.")
-                playing = False
-                break
-            elif choice == "1":
-                print("You have decided to keep playing.")
+            playing = call_or_fold()
         else:
             dealing_cards()
             print_cards(dealer_cards)
             current_hand(player_cards, dealer_cards)
+            print("Turn #", numTurn, "What would you like to do?")
+            playing = call_or_fold()
         numTurn += 1
     print("This round has concluded, returning to main menu...")
 
@@ -59,7 +68,7 @@ def pre_flop():
     player_hand1 = ""
     player_hand2 = ""
     suited = "o"
-    # os.system('clear')
+    os.system('clear')
     print("##################################")
     player_hand1 += firstCard.value
     player_hand1 += secondCard.value
@@ -93,17 +102,6 @@ def pre_flop():
     player_cards.append(secondCard)
     print("##################################")
     print("Pre-flop turn. What would you like to do?")
-    print("1. Call/Raise")
-    print("2. Fold")
-    choice = input(" >")
-    if choice == "1":
-        print("You have decided to keep playing.")
-        return True
-        # Player now enters 3 flop cards for calculation
-    elif choice == "2":
-        print("You have decided to fold your hand.")
-        return False
-        # update stats and return to main menu
 
 # Dealing a card to the table
 
@@ -116,6 +114,22 @@ def dealing_cards():
     dealer_cards.append(dealt_card)
 
 # Printing ASCII version of playing cards
+
+
+def call_or_fold():
+    choice = ""
+    while choice not in ["1", "2"]:
+        print("1. Call/Raise")
+        print("2. Fold")
+        choice = input(" >")
+        if choice == "1":
+            print("You have decided to keep playing.")
+            return True
+        elif choice == "2":
+            print("You have decided to fold your hand.")
+            return False
+        else:
+            print("Invalid input! Please try again.")
 
 
 def print_cards(cards):
@@ -163,7 +177,7 @@ def statistics():
 
 
 def main():
-    print("Welcome to PokerBot 1.0.0")
+    print(WELCOME)
     print("Author: Konrad Bledowski")
     # test_card_1 = Card('4', 'D')
     # test_card_2 = Card('A', 'C')
@@ -177,7 +191,8 @@ def main():
         print("What would you like to do?")
         print("1. Play a game")
         print("2. View statistics")
-        print("3. Quit")
+        print("3. Help")
+        print("4. Quit")
         choice = input(" > ")
         if choice == "1":
             print("Starting game...")
@@ -185,6 +200,8 @@ def main():
         elif choice == "2":
             print("Statistics not yet implemented :(")
         elif choice == "3":
+            print("Help not yet implemented")
+        elif choice == "4":
             playing = False
         else:
             print("Invalid input! Please try again.")

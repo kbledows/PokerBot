@@ -1,3 +1,5 @@
+# File for calculating best possible hands
+
 import itertools
 
 hand_values = {
