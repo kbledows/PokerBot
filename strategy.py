@@ -54,33 +54,31 @@ DTier = ['Q4s', 'Q3s', 'Q2s', 'J6s', 'J5s', 'J4s', 'J3s', 'J2s', 'T5s', 'T4s', '
 # used to determine the best hand that the player currently has
 # use itertools to create all possible variations of the hand the player has, and then find the highest value 5 card combination
 def current_hand(player_cards, dealer_cards):
+    best_hand = []
     value = 1  # priority 1
     high_card = 0  # priority 2
     pd_cards = player_cards + dealer_cards
     pd_card_values = []
     for card in pd_cards:
         pd_card_values.append(card.points)
+    pd_card_values.sort()
     possible_hands = list(itertools.combinations(pd_cards, 5))
-    if len(pd_cards) == 5:
-        if calculate_best(pd_cards, pd_card_values) > value:
-            value = calculate_best(pd_cards, pd_card_values)
+    for possible_hand in possible_hands:
+        if calculate_best(possible_hand, pd_card_values) > value:
+            value = calculate_best(possible_hand, pd_card_values)
             high_card = find_high_card(pd_card_values)
+            best_hand = possible_hand
         elif value == 1:
             high_card = find_high_card(pd_card_values)
-    else:
-        for possible_hand in possible_hands:
-            if calculate_best(possible_hand, pd_card_values) > value:
-                value = calculate_best(possible_hand, pd_card_values)
-                high_card = find_high_card(pd_card_values)
-            elif value == 1:
-                high_card = find_high_card(pd_card_values)
 
     print("You currently have a " + hand_values[value] + "!")
     print("Your high card is a(n): ", card_values[high_card])
     print("This hand has a value of:", value,
           "out of 9, where 1 is the weakest and 9 is the strongest.")
 
+
 def calculate_best(possible_hand, pd_card_values):
+    print("These are your cards vals: " + str(pd_card_values))
     value = 0
     if (contains_straight(pd_card_values) and contains_flush(possible_hand)):  # Covers straight flush
         return 9
@@ -93,12 +91,9 @@ def calculate_best(possible_hand, pd_card_values):
     # Covers straight
     elif (contains_straight(pd_card_values)):
         return 5
-    # Covers three of a kind, 2 pair, one pair [2,3,4]
-    elif (find_x_of_a_kind(pd_card_values) >= 2):
-        return find_x_of_a_kind(pd_card_values)
-    # No hand found. Go based off of the high card
+    # Covers high card, one pair, two pair, three of a kind [1,2,3,4]
     else:
-        return 1
+        return find_x_of_a_kind(pd_card_values)
 
 
 # Example all_card_values = [2,4,5,5,7,11,12]

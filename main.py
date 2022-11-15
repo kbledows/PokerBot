@@ -18,7 +18,7 @@ dealer_cards = []
 def game():
     numTurn = 1
     playing = True
-    while (numTurn < 5) and playing == True:
+    while (numTurn < 4) and playing == True:
         # preflop turn is the first turn
         if numTurn == 1:
             playing = pre_flop()
@@ -28,8 +28,20 @@ def game():
                 dealing_cards()
             print_cards(dealer_cards)
             current_hand(player_cards, dealer_cards)
-        else:  # not the first turn
-            sys.exit()
+            print("Post-flop turn. What would you like to do?")
+            print("1. Call/Raise")
+            print("2. Fold")
+            choice = input(" >")
+            if choice == "2":
+                print("You have decided to fold your hand.")
+                playing = False
+                break
+            elif choice == "1":
+                print("You have decided to keep playing.")
+        else:
+            dealing_cards()
+            print_cards(dealer_cards)
+            current_hand(player_cards, dealer_cards)
         numTurn += 1
     print("This round has concluded, returning to main menu...")
 
@@ -97,7 +109,7 @@ def pre_flop():
 
 
 def dealing_cards():
-    print("The dealer has dealt a card! Please enter the card's value and suit in the following format:")
+    print("The dealer has dealt a card to the table! Please enter the card's value and suit in the following format:")
     print("Ten of Clubs == [Tc]")
     ask = input(" >")
     dealt_card = Card(ask[0], ask[1])
