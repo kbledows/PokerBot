@@ -12,16 +12,18 @@ import time
 
 
 # Colors (final)
-GREEN = '\032[92m'  # green
+GREEN = '\033[92m'  # green
 YELLOW = "\u001b[38;5;226m"  # yellow
-RED = '\031[31m'  # red
+RED = '\033[91m'  # red
 # dark grey; to make lighter, increase 238 to anything 255 or below
 GREY = '\u001b[48;5;238m'
 NO_COLOR = '\033[0m'  # white
 BLUE = '\033[34m'  # blue
 
+# Global variables to store player and dealer cards
 player_cards = []
 dealer_cards = []
+best_hand = []
 
 WELCOME = """
   _____      _                _____       _                
@@ -35,16 +37,12 @@ WELCOME = """
 """
 
 
+# Function that clears the user terminal and has support for multiple operating systems
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-# now, to clear the screen
-
-
 # Main gameplay loop
-
-
 def game():
     numTurn = 1
     playing = True
@@ -61,42 +59,42 @@ def game():
             print("These are the cards on the table:")
             print("")
             print_cards(dealer_cards)
-            print("This is your hand:")
+            print("These are your cards:")
             print("")
             print_cards(player_cards)
-            current_hand(player_cards, dealer_cards)
+            best_hand = list(current_hand(player_cards, dealer_cards))
             print("Post-flop turn. What would you like to do?")
             playing = call_or_fold()
+        # During the 3rd and 4th turns, the dealer simply deals 1 card to the table
         else:
             dealer_cards.append(dealing_cards())
             cls()
             print("These are the cards on the table:")
             print("")
             print_cards(dealer_cards)
-            print("This is your hand:")
+            print("These are your cards:")
             print("")
             print_cards(player_cards)
-            current_hand(player_cards, dealer_cards)
+            best_hand = list(current_hand(player_cards, dealer_cards))
             if numTurn == 4:
                 break
             else:
                 print("Turn #", numTurn, "What would you like to do?")
                 playing = call_or_fold()
         numTurn += 1
+    # Round is over, because the player has either folded, or the round has concluded
     time.sleep(1)
     print("This round has concluded, enter any key to return to the main menu.")
     returnMenu = input(" >")
     player_cards.clear()
     dealer_cards.clear()
+    best_hand.clear()
     time.sleep(1)
     cls()
 
 
+# First turn during a poker round
 def pre_flop():
-    print("You have just been dealt a new hand. Please enter your cards using the following format:")
-    print("Ten of Clubs == [Tc]")
-    print("Possible card values: 2 3 4 5 6 7 8 9 T J Q K A")
-    print("Possible suits: Spades (s), Hearts (h), Clubs (c), Diamonds (d)")
     firstCard = dealing_cards()
     secondCard = dealing_cards()
     player_cards.append(firstCard)
@@ -105,7 +103,7 @@ def pre_flop():
     player_hand2 = ""
     suited = "o"
     cls()
-    print("##################################")
+    print("")
     player_hand1 += firstCard.value
     player_hand1 += secondCard.value
     player_hand1 += suited
@@ -113,6 +111,7 @@ def pre_flop():
     player_hand2 += firstCard.value
     player_hand2 += suited
     print_cards([firstCard, secondCard])
+    # Inform the player the strength of their starting hand
     if (player_hand1 in STier) or (player_hand2 in STier):
         print("Your hand is amazing! [S Tier]")
         print("Suggested play: aggressive preflop raise")
@@ -137,14 +136,15 @@ def pre_flop():
     print("##################################")
     print("Pre-flop turn. What would you like to do?")
 
+
 # Dealing a card (to player or the table)
 # If argument is true, card is added to player_cards, if false, added to dealer_cards
-
-
 def dealing_cards():
     ask = ""
     print("A card has been dealt! Please enter the card's value and suit in the following format:")
     print("Ten of Clubs == [Tc]")
+    print("Possible card values: 2 3 4 5 6 7 8 9 T J Q K A")
+    print("Possible suits: Spades (s), Hearts (h), Clubs (c), Diamonds (d)")
     while True:
         ask = input(" >")
         if ask not in all_possible_cards:
@@ -154,9 +154,9 @@ def dealing_cards():
     dealt_card = Card(ask[0], ask[1])  # create the card based on user input
     return dealt_card
 
-# Printing ASCII version of playing cards
 
-
+# Function that takes user input for each turn during a round.
+# Input cleansing so the user cannot cause an input error
 def call_or_fold():
     choice = ""
     while choice not in ["1", "2"]:
@@ -173,6 +173,7 @@ def call_or_fold():
             print("Invalid input! Please try again.")
 
 
+# Printing ASCII version of playing cards
 def print_cards(cards):
     cards_copy = cards.copy()
     empty = Card('?', '?')
@@ -182,7 +183,8 @@ def print_cards(cards):
     if (len(cards) == 4):
         cards_copy.append(empty)
     suits_name = ['s', 'd', 'h', 'c', '?']
-    suits_symbols = ['♠', '♦', '♥', '♣', '?']
+    suits_symbols = [f'{BLUE}♠{NO_COLOR}', f'{RED}♦{NO_COLOR}',
+                     f'{RED}♥{NO_COLOR}', f'{BLUE}♣{NO_COLOR}', f'{GREEN}?{NO_COLOR}']
     lines = [[] for i in range(9)]
     for index, card in enumerate(cards_copy):
         # "King" should be "K" and "10" should still be "10"
@@ -216,22 +218,15 @@ def print_cards(cards):
 
 
 # Statistics & file IO
-# def statistics():
-#     pass
+def write_to_file():
+    pass
+
 
 # Main Menu
-
-
 def main():
     cls()
     print(WELCOME)
-    print("Author: Konrad Bledowski")
-    # test_card_1 = Card('4', 'D')
-    # test_card_2 = Card('A', 'C')
-    # test_card_3 = Card('J', 'S')
-    # test_card_4 = Card('T', 'H')
-
-    # print_cards([test_card_1, test_card_2, test_card_3, test_card_4])
+    print(f"{RED}Author: Konrad Bledowski{NO_COLOR}")
     playing = True
     choice = ""
     while playing:
@@ -242,7 +237,7 @@ def main():
         print("4. Quit")
         choice = input(" > ")
         if choice == "1":
-            print("Starting game...")
+            cls()
             game()
         elif choice == "2":
             print("Statistics not yet implemented :(")
@@ -257,6 +252,13 @@ def main():
     sys.exit()
 
 
+# Function used to debug my program
+# test_card_1 = Card('4', 'D')
+# test_card_2 = Card('A', 'C')
+# test_card_3 = Card('J', 'S')
+# test_card_4 = Card('T', 'H')
+
+# print_cards([test_card_1, test_card_2, test_card_3, test_card_4])
 def debug_func():
     test_card_1 = Card('A', 'h')
     test_card_2 = Card('2', 'd')

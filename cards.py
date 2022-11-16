@@ -1,6 +1,7 @@
 # cards
 
 class Card(object):
+    # Point values for each card using a dictionary
     card_values = {
         'A': 14,  # value of the ace is high until it needs to be low
         '2': 2,
@@ -18,11 +19,13 @@ class Card(object):
         '?': 0
     }
 
+    # No args constructor
     def __init__(self) -> None:
         self.value = "none"
         self.suit = "none"
         self.points = "none"
 
+    # Default constructor
     def __init__(self, value, suit):
         """
         :param suit: The face of the card, e.g. Spade or Diamond
@@ -33,6 +36,7 @@ class Card(object):
         self.suit = suit
         self.points = self.card_values[value]
 
+    #Setters and getters
     def setValue(self, value):
         self.value = value
 

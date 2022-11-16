@@ -2,6 +2,7 @@
 
 import itertools
 from statistics import print_stats
+from cards import Card
 
 hand_values = {
     1: "High card",
@@ -65,12 +66,12 @@ def current_hand(player_cards, dealer_cards):
     pd_card_values = []
     for card in pd_cards:
         pd_card_values.append(card.points)
+    # Create a list of all possible 5 card combinations
     possible_hands = list(itertools.combinations(pd_cards, 5))
     for possible_hand in possible_hands:
         ph_card_values = []
         for card in possible_hand:
             ph_card_values.append(card.points)
-        print(ph_card_values)
         if calculate_best(possible_hand, ph_card_values) > value:
             value = calculate_best(possible_hand, ph_card_values)
             high_card = find_high_card(ph_card_values)
@@ -82,6 +83,7 @@ def current_hand(player_cards, dealer_cards):
     print("Your high card is a(n): ", card_values[high_card])
     print("This hand has a value of:", value,
           "out of 9, where 1 is the weakest and 9 is the strongest.")
+    return best_hand
     # opponent_hands(dealer_cards, player_cards, best_hand, value)
 
 
@@ -130,8 +132,9 @@ def contains_straight(all_card_values):
     prev = 0
     counter = 1
     consecutive_nums = 1
+    #calculate the number of consecutive cards
     while counter < len(straight_values):
-        if consecutive_nums == 5:
+        if consecutive_nums == 5: #We have a straight!
             break
         if (straight_values[counter]) == (straight_values[prev] - 1):
             consecutive_nums += 1
@@ -140,6 +143,7 @@ def contains_straight(all_card_values):
 
         counter += 1
         prev += 1
+    # 5 cards must be consecutive
     if consecutive_nums >= 5:
         straight = True
     return straight
@@ -196,6 +200,7 @@ def find_x_of_a_kind(all_card_values):
         return 1
 
 
+# Return the highest card that a player has
 def find_high_card(values):
     return max(values)
 
@@ -203,29 +208,27 @@ def find_high_card(values):
 # pass in the best hand, list of 5 cards.
 # first, remove your cards from the list of all cards
 def opponent_hands(dealer_cards, player_cards, best_hand, value):
+    num_enemy_cards = 52
+    #clubs, diamonds, hearts, spades
+    num_suits = [13, 13, 13, 13]
+    # goes in order: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+    num_values = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
     pd_cards = dealer_cards + player_cards
-    # all possible enemy cards list
-    all_possible_enemy_cards = all_possible_cards.copy()
-    # remove player cards and dealer cards from opponent's card list
+    all_possible_cards_copy = all_possible_cards.copy()
+    all_possible_enemy_cards = []
     for card in pd_cards:
         cardStr = card.value + card.suit
-        all_possible_enemy_cards.remove(cardStr)
-    # generate all possible length 2 arrays based off the cards the opponenet could have been dealt.
-    possible_enemy_hands = list(
-        itertools.combinations(all_possible_enemy_cards, 2))
-    enemy_5_card_hands = []
-    for card_list in possible_enemy_hands:
-        enemy_5_card_hands.append(card_list + dealer_cards)
-    best_opponent_hand = []
-    enemy_value = 1  # priority 1
-    enemy_high_card = 0  # priority 2
-    for possible_hand in enemy_5_card_hands:
-        enemy_card_values = []
-        for card in possible_hand:
-            enemy_card_values.append(card.points)
-        if calculate_best(possible_hand, enemy_card_values) > value:
-            value = calculate_best(possible_hand, enemy_card_values)
-            high_card = find_high_card(enemy_card_values)
-            best_hand = possible_hand
-        elif value == 1:
-            high_card = find_high_card(enemy_card_values)
+        all_possible_cards_copy.remove(cardStr)
+        num_enemy_cards -= 1
+        if card.suit == 'c':
+            num_suits[0] -= 1
+        elif card.suit == 'd':
+            print("")
+    for string in all_possible_cards_copy:
+        all_possible_enemy_cards.append(Card(string[0], string[1]))
+    # we know player value
+    if value == 9:
+        print("Player has the best hand")
+        print("Only another straight flush can tie/beat this.")
+    else:
+        pass
