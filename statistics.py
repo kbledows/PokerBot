@@ -4,5 +4,5 @@
 from tabulate import tabulate
 
 
-def opponent_hands(dealer_cards):
+def print_stats():
     pass

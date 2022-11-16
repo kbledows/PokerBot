@@ -26,7 +26,8 @@ class Card(object):
     def __init__(self, value, suit):
         """
         :param suit: The face of the card, e.g. Spade or Diamond
-        :param rank: The value of the card, e.g 3 or King
+        :param value: The value of the card, e.g 3 or King
+        :param points: Numerical power of given card value, ie: 10 is worth 10 points, J is worth 11.
         """
         self.value = value
         self.suit = suit

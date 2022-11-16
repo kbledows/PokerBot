@@ -6,9 +6,19 @@
 
 from cards import Card
 from strategy import *
-from statistics import *
 import sys
 import os
+import time
+
+
+# Colors (final)
+GREEN = '\032[92m'  # green
+YELLOW = "\u001b[38;5;226m"  # yellow
+RED = '\031[31m'  # red
+# dark grey; to make lighter, increase 238 to anything 255 or below
+GREY = '\u001b[48;5;238m'
+NO_COLOR = '\033[0m'  # white
+BLUE = '\033[34m'  # blue
 
 player_cards = []
 dealer_cards = []
@@ -46,7 +56,7 @@ def game():
         # flop occurs on the second turn
         elif numTurn == 2:
             while len(dealer_cards) < 3:
-                dealing_cards()
+                dealer_cards.append(dealing_cards())
             cls()
             print("These are the cards on the table:")
             print("")
@@ -58,7 +68,7 @@ def game():
             print("Post-flop turn. What would you like to do?")
             playing = call_or_fold()
         else:
-            dealing_cards()
+            dealer_cards.append(dealing_cards())
             cls()
             print("These are the cards on the table:")
             print("")
@@ -67,10 +77,19 @@ def game():
             print("")
             print_cards(player_cards)
             current_hand(player_cards, dealer_cards)
-            print("Turn #", numTurn, "What would you like to do?")
-            playing = call_or_fold()
+            if numTurn == 4:
+                break
+            else:
+                print("Turn #", numTurn, "What would you like to do?")
+                playing = call_or_fold()
         numTurn += 1
-    print("This round has concluded, returning to main menu...")
+    time.sleep(1)
+    print("This round has concluded, enter any key to return to the main menu.")
+    returnMenu = input(" >")
+    player_cards.clear()
+    dealer_cards.clear()
+    time.sleep(1)
+    cls()
 
 
 def pre_flop():
@@ -78,11 +97,10 @@ def pre_flop():
     print("Ten of Clubs == [Tc]")
     print("Possible card values: 2 3 4 5 6 7 8 9 T J Q K A")
     print("Possible suits: Spades (s), Hearts (h), Clubs (c), Diamonds (d)")
-    # add while loop with input validation
-    card1 = input("Enter your first card's value and suit >")
-    firstCard = Card(card1[0], card1[1])
-    card2 = input("Enter your second card's value and suit >")
-    secondCard = Card(card2[0], card2[1])
+    firstCard = dealing_cards()
+    secondCard = dealing_cards()
+    player_cards.append(firstCard)
+    player_cards.append(secondCard)
     player_hand1 = ""
     player_hand2 = ""
     suited = "o"
@@ -116,20 +134,25 @@ def pre_flop():
     if firstCard.suit == secondCard.suit:
         suited = "s"
         print("NOTE: Your cards are suited! Watch for a possible flush draw.")
-    player_cards.append(firstCard)
-    player_cards.append(secondCard)
     print("##################################")
     print("Pre-flop turn. What would you like to do?")
 
-# Dealing a card to the table
+# Dealing a card (to player or the table)
+# If argument is true, card is added to player_cards, if false, added to dealer_cards
 
 
 def dealing_cards():
-    print("The dealer has dealt a card to the table! Please enter the card's value and suit in the following format:")
+    ask = ""
+    print("A card has been dealt! Please enter the card's value and suit in the following format:")
     print("Ten of Clubs == [Tc]")
-    ask = input(" >")
-    dealt_card = Card(ask[0], ask[1])
-    dealer_cards.append(dealt_card)
+    while True:
+        ask = input(" >")
+        if ask not in all_possible_cards:
+            print("That is not a valid card! Please try again")
+        else:
+            break
+    dealt_card = Card(ask[0], ask[1])  # create the card based on user input
+    return dealt_card
 
 # Printing ASCII version of playing cards
 
@@ -193,10 +216,8 @@ def print_cards(cards):
 
 
 # Statistics & file IO
-
-
-def statistics():
-    pass
+# def statistics():
+#     pass
 
 # Main Menu
 

@@ -1,6 +1,7 @@
 # File for calculating best possible hands
 
 import itertools
+from statistics import print_stats
 
 hand_values = {
     1: "High card",
@@ -30,6 +31,7 @@ card_values = {
     13: "King"
 }
 
+# all 52 cards in str format.
 all_possible_cards = ['2s', '2h', '2d', '2c', '3s', '3h', '3d', '3c', '4s', '4h', '4d', '4c', '5s', '5h', '5d', '5c', '6s', '6h', '6d', '6c', '7s', '7h', '7d', '7c', '8s',
                       '8h', '8d', '8c', '9s', '9h', '9d', '9c', 'Ts', 'Th', 'Td', 'Tc', 'Js', 'Jh', 'Jd', 'Jc', 'Qs', 'Qh', 'Qd', 'Qc', 'Ks', 'Kh', 'Kd', 'Kc', 'As', 'Ah', 'Ad', 'Ac']
 
@@ -65,19 +67,26 @@ def current_hand(player_cards, dealer_cards):
         pd_card_values.append(card.points)
     possible_hands = list(itertools.combinations(pd_cards, 5))
     for possible_hand in possible_hands:
-        if calculate_best(possible_hand, pd_card_values) > value:
-            value = calculate_best(possible_hand, pd_card_values)
-            high_card = find_high_card(pd_card_values)
+        ph_card_values = []
+        for card in possible_hand:
+            ph_card_values.append(card.points)
+        print(ph_card_values)
+        if calculate_best(possible_hand, ph_card_values) > value:
+            value = calculate_best(possible_hand, ph_card_values)
+            high_card = find_high_card(ph_card_values)
             best_hand = possible_hand
-        elif value == 1:
-            high_card = find_high_card(pd_card_values)
 
+    if value == 1:
+        high_card = find_high_card(pd_card_values)
     print("You currently have a " + hand_values[value] + "!")
     print("Your high card is a(n): ", card_values[high_card])
     print("This hand has a value of:", value,
           "out of 9, where 1 is the weakest and 9 is the strongest.")
+    # opponent_hands(dealer_cards, player_cards, best_hand, value)
 
 
+# Determines the value of a given 5 card array.
+# Returns the numerical value of the 5 card hand.
 def calculate_best(possible_hand, pd_card_values):
     # print("These are your cards vals: " + str(pd_card_values))
     value = 0
@@ -109,7 +118,8 @@ def calculate_best(possible_hand, pd_card_values):
 # Straight Flush = 9 [done]
 
 
-# Convert the while loop to a for loop later, wouldn't need counter anymore
+# Contains straight determines whether a given 5 card array is a straight or not.
+# Returns true if a straight, false otherwise
 def contains_straight(all_card_values):
     straight_values = all_card_values.copy()
     straight = False
@@ -135,6 +145,8 @@ def contains_straight(all_card_values):
     return straight
 
 
+# Contains flush determines whether given 5 card array is a flush or not.
+# Returns true if a flush, false otherwise
 def contains_flush(all_cards):
     flush = False
     diamonds, spades, clubs, hearts = 0, 0, 0, 0
@@ -186,3 +198,34 @@ def find_x_of_a_kind(all_card_values):
 
 def find_high_card(values):
     return max(values)
+
+
+# pass in the best hand, list of 5 cards.
+# first, remove your cards from the list of all cards
+def opponent_hands(dealer_cards, player_cards, best_hand, value):
+    pd_cards = dealer_cards + player_cards
+    # all possible enemy cards list
+    all_possible_enemy_cards = all_possible_cards.copy()
+    # remove player cards and dealer cards from opponent's card list
+    for card in pd_cards:
+        cardStr = card.value + card.suit
+        all_possible_enemy_cards.remove(cardStr)
+    # generate all possible length 2 arrays based off the cards the opponenet could have been dealt.
+    possible_enemy_hands = list(
+        itertools.combinations(all_possible_enemy_cards, 2))
+    enemy_5_card_hands = []
+    for card_list in possible_enemy_hands:
+        enemy_5_card_hands.append(card_list + dealer_cards)
+    best_opponent_hand = []
+    enemy_value = 1  # priority 1
+    enemy_high_card = 0  # priority 2
+    for possible_hand in enemy_5_card_hands:
+        enemy_card_values = []
+        for card in possible_hand:
+            enemy_card_values.append(card.points)
+        if calculate_best(possible_hand, enemy_card_values) > value:
+            value = calculate_best(possible_hand, enemy_card_values)
+            high_card = find_high_card(enemy_card_values)
+            best_hand = possible_hand
+        elif value == 1:
+            high_card = find_high_card(enemy_card_values)
